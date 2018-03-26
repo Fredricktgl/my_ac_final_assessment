@@ -20,7 +20,9 @@
             <%= form_tag unfollow_notes_path, method: :post do %>
             <%= hidden_field_tag :follow, current_user.id %>
             <%= hidden_field_tag :following, u.id %>
-            <%= submit_tag 'Unfollow', class: "following-button" %>
+              <% if u.id != current_user.id %>
+                <%= submit_tag 'Unfollow', class: "following-button" %>
+              <% end %>
             <% end %>
           <% else %>
             <%= form_tag follow_notes_path, method: :post do %>
@@ -50,11 +52,24 @@
         <strong>User: </strong> <%= n.user_id %></br>
         <strong>Title:</strong> <%= n.title %></br>
         <strong>Body:</strong> <%= n.body %></br>
-        
         <% if current_user %>
-          <%= link_to 'Edit', edit_note_path(n) %>
-          <%= link_to 'Delete', note_path(n), method: :delete, data: { confirm: 'Confirm?'} %>
-        <% end %></br>
+        
+          <% counter = 0 %>
+          <% @likes.each do |l| %>
+
+            <% counter += 1 if n.id == l.note_id%>
+
+          <% end %>
+          Number of likes: <%= counter %>
+
+        <%= link_to 'Like', like_notes_path(n), method: :post %>
+        <%= link_to 'Unlike', unlike_notes_path(n), method: :post %>
+        
+          <% if current_user.id == n.user_id %>
+            <%= link_to 'Edit', edit_note_path(n) %>
+            <%= link_to 'Delete', note_path(n), method: :delete, data: { confirm: 'Confirm?'} %>
+          <% end %>
+        <% end %></br></br>
       <% end %>
     
     </div>

@@ -13,10 +13,12 @@ class NotesController < ApplicationController
         @following_array << following.following_id
       end
 
-      @notes = Note.where(user_id: current_user)
+      feed = @following_array << current_user.id
+      @notes = Note.where(user_id: feed)
+      @likes = Like.all
       
     end
-    
+
   end
 
   def new
@@ -54,11 +56,37 @@ class NotesController < ApplicationController
   def follow
     follow = Relationship.new(follower_id: params[:follow], following_id: params[:following])
     follow.save
+
+    followinglist = Relationship.where(follower_id: current_user.id)
+    followinglist.each do |list|
+
+      followingnotes = Note.where(user_id: list.following_id)
+      followingnotes.each do |fn|
+         
+        Relationshipsnote.find_or_create_by(relationship_id: list.id, note_id: fn.id)
+
+      end
+    end
     redirect_to root_path
   end
 
   def unfollow
     unfollow = Relationship.where("follower_id = ? AND following_id = ?", "#{params[:follow]}", "#{params[:following]}").destroy_all
+    redirect_to root_path
+  end
+
+  def like
+    @note = params[:format]
+    Like.find_or_create_by(user_id: current_user.id, note_id: @note)
+
+    redirect_to root_path
+  end
+
+  def unlike
+    @note = params[:format]
+    @note = Like.where(user_id: current_user.id, note_id: @note)
+    @note.destroy_all
+
     redirect_to root_path
   end
 

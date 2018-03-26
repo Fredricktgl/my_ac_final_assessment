@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   resources :notes do
     post :follow, on: :collection
     post :unfollow, on: :collection
+    post :like, on: :collection
+    post :unlike, on: :collection
   end
 
 end
