@@ -1,1 +1,35 @@
-Test
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <%= link_to 'New note', new_note_path %>
+    </div>
+
+    <div class="col-md-6">
+      <p class="text-center">List of Users</p>
+
+      <% @users.each do |u| %>
+
+        <%= u.name %></br>
+
+      <% end %>
+    
+    </div>
+
+    <div class="col-md-6">
+      <p class="text-center">My Notes</p>
+
+      <% @notes.each do |n| %>
+
+        <strong>Title:</strong> <%= n.title %></br>
+        <strong>Body:</strong> <%= n.body %></br>
+        
+        <%= link_to 'Edit', edit_note_path(n) %>
+        <%= link_to 'Delete', note_path(n), method: :delete, data: { confirm: 'Confirm?'} %>
+        </br></br>
+
+      <% end %>
+    
+    </div>
+  </div>
+</div>
+
