@@ -1,7 +1,12 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <%= link_to 'New note', new_note_path %>
+      <% if current_user %>
+        <%= link_to 'New note', new_note_path %> 
+        <%= link_to('Log out', destroy_user_session_path, method: :delete) %>
+      <% else %>
+        <%= link_to 'Log in', new_user_session_path %>
+      <% end %>
     </div>
 
     <div class="col-md-6">
@@ -9,24 +14,47 @@
 
       <% @users.each do |u| %>
 
-        <%= u.name %></br>
+        <%= u.name %>
+        <% if current_user %>
+          <% if @following_array.include?(u.id)%>
+            <%= form_tag unfollow_notes_path, method: :post do %>
+            <%= hidden_field_tag :follow, current_user.id %>
+            <%= hidden_field_tag :following, u.id %>
+            <%= submit_tag 'Unfollow', class: "following-button" %>
+            <% end %>
+          <% else %>
+            <%= form_tag follow_notes_path, method: :post do %>
+            <%= hidden_field_tag :follow, current_user.id %>
+            <%= hidden_field_tag :following, u.id.to_s %>
+              <% if u.id != current_user.id %>
+                <%= submit_tag 'Follow', class: "follow-button" %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+        </br>
 
-      <% end %>
-    
+      <% end %>      
+
     </div>
 
     <div class="col-md-6">
-      <p class="text-center">My Notes</p>
+      <% if current_user %>
+        <p class="text-center">My notes and notes from users that I am following</p>
+      <% else %>
+        <p class="text-center">All Notes</p>
+      <% end %>
 
       <% @notes.each do |n| %>
 
+        <strong>User: </strong> <%= n.user_id %></br>
         <strong>Title:</strong> <%= n.title %></br>
         <strong>Body:</strong> <%= n.body %></br>
         
-        <%= link_to 'Edit', edit_note_path(n) %>
-        <%= link_to 'Delete', note_path(n), method: :delete, data: { confirm: 'Confirm?'} %>
-        </br></br>
-
+        <% if current_user %>
+          <%= link_to 'Edit', edit_note_path(n) %>
+          <%= link_to 'Delete', note_path(n), method: :delete, data: { confirm: 'Confirm?'} %>
+        <% end %></br>
       <% end %>
     
     </div>
