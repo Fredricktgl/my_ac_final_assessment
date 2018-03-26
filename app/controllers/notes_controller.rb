@@ -77,13 +77,19 @@ class NotesController < ApplicationController
 
   def like
     @note = params[:format]
+    user_note = Note.find(@note)
+    
     Like.find_or_create_by(user_id: current_user.id, note_id: @note)
+    NoteMailer.like_email(user_note.user_id).deliver_later 
 
     redirect_to root_path
   end
 
   def unlike
     @note = params[:format]
+    user_note = Note.find(@note)
+    NoteMailer.dislike_email(user_note.user_id).deliver_later 
+
     @note = Like.where(user_id: current_user.id, note_id: @note)
     @note.destroy_all
 
